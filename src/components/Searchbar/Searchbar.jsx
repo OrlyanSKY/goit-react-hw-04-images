@@ -23,10 +23,7 @@ export class Searchbar extends Component {
     e.preventDefault();
 
     if (this.state.query.trim() === '') {
-      return toast.error('Enter search query, please!', {
-        position: 'top-center',
-        autoClose: 3000,
-      });
+      return toast.error('Enter search query, please!');
     }
     this.props.onSubmit(this.state.query.toLowerCase());
     this.setState({ query: '' });

@@ -17,6 +17,7 @@ export class App extends Component {
   };
 
   componentDidMount(prevState, prevProps) {}
+
   render() {
     return (
       <div
@@ -29,7 +30,8 @@ export class App extends Component {
       >
         <Searchbar onSubmit={this.getSearchQueryValue} />
         <ImageGallery searchQuery={this.state.searchQuery} />
-        <ToastContainer />
+
+        <ToastContainer position="top-center" autoClose={3000} theme="dark" />
       </div>
     );
   }

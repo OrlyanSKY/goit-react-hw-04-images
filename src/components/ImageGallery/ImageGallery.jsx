@@ -1,24 +1,41 @@
 import { Component } from 'react';
-import axios from 'axios';
+
+import { toast } from 'react-toastify';
+
+import { pixabayAPI } from 'services/pixabayAPI';
 
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Gallery } from './ImageGallery.styled';
+import { Loader } from 'components/Loader/Loader';
+import Button from 'components/Button/Button';
 
 export class ImageGallery extends Component {
   state = {
     data: [],
+    page: 1,
+    isLoading: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.searchQuery !== this.props.searchQuery) {
-      return axios
-        .get(
-          `https://pixabay.com/api/?q=${this.props.searchQuery}&page=1&key=29482011-99768188be0395583a9f1e73d&image_type=photo&orientation=horizontal&per_page=12`
-        )
-        .then(response =>
+      this.setState({ isLoading: true });
+
+      pixabayAPI(this.props.searchQuery, this.state.page)
+        .then(res => {
+          if (res.length === 0) {
+            toast.error('Oooops( Nothing to show!!!');
+          }
           this.setState({
-            data: response.data.hits,
-          })
+            data: res,
+          });
+        })
+        .catch(() => toast.error('Ooops...try again later'))
+        .finally(
+          setTimeout(() => {
+            this.setState({
+              isLoading: false,
+            });
+          }, 1000)
         );
     }
   }
@@ -28,6 +45,8 @@ export class ImageGallery extends Component {
         <Gallery>
           <ImageGalleryItem data={this.state.data} />
         </Gallery>
+        <Loader visible={this.state.isLoading} />
+        {this.state.data.length !== 0 && <Button />}
       </>
     );
   }

@@ -1,23 +1,22 @@
 import { Component } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Searchbar } from './Searchbar/Searchbar';
 
 export class App extends Component {
   state = {
-    searchQuery: 'helloy',
+    searchQuery: '',
   };
+
   getSearchQueryValue = value => {
     this.setState({
       searchQuery: value,
     });
   };
-  componentDidMount(prevState, prevProps) {
-    if (this.state.searchQuery) {
-      // fetch(
-      //   'https://pixabay.com/api/?q=cat&page=1&key=29482011-99768188be0395583a9f1e73d&image_type=photo&orientation=horizontal&per_page=12'
-      // );
-    }
-  }
+
+  componentDidMount(prevState, prevProps) {}
   render() {
     return (
       <div
@@ -29,7 +28,8 @@ export class App extends Component {
         }}
       >
         <Searchbar onSubmit={this.getSearchQueryValue} />
-        <ImageGallery />
+        <ImageGallery searchQuery={this.state.searchQuery} />
+        <ToastContainer />
       </div>
     );
   }

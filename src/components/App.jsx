@@ -22,24 +22,6 @@ export class App extends Component {
     largeImage: '',
   };
 
-  getSearchQueryValue = value => {
-    this.setState({
-      searchQuery: value,
-      page: 1,
-      items: [],
-    });
-  };
-
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  showModal = image => {
-    this.setState({ modalShow: true, largeImage: image });
-  };
-
   async componentDidUpdate(_, prevState) {
     const { page, searchQuery } = this.state;
 
@@ -62,6 +44,31 @@ export class App extends Component {
     }
   }
 
+  getSearchQueryValue = value => {
+    this.setState({
+      searchQuery: value,
+      page: 1,
+      items: [],
+    });
+  };
+
+  loadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
+  showModal = image => {
+    this.setState({ largeImage: image });
+    this.toggleModal();
+  };
+
+  toggleModal = () => {
+    this.setState(prevState => ({
+      modalShow: !prevState.modalShow,
+    }));
+  };
+
   render() {
     const { items, loading, modalShow, largeImage } = this.state;
 
@@ -72,7 +79,7 @@ export class App extends Component {
 
         {loading && <Loader />}
         {items.length !== 0 && <Button onClick={this.loadMore} />}
-        {modalShow && <Modal image={largeImage} />}
+        {modalShow && <Modal image={largeImage} onClose={this.toggleModal} />}
 
         <ToastContainer position="top-center" autoClose={3000} theme="dark" />
       </Container>

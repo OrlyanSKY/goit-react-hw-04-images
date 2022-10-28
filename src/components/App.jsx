@@ -9,7 +9,7 @@ import { Container } from './Container/Container.styled';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
-import Button from './Button/Button';
+import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
 
 export class App extends Component {
@@ -64,8 +64,8 @@ export class App extends Component {
   };
 
   toggleModal = () => {
-    this.setState(prevState => ({
-      modalShow: !prevState.modalShow,
+    this.setState(({ modalShow }) => ({
+      modalShow: !modalShow,
     }));
   };
 
@@ -77,7 +77,7 @@ export class App extends Component {
         <Searchbar onSubmit={this.getSearchQueryValue} />
         <ImageGallery items={items} onClick={this.showModal} />
 
-        {loading && <Loader />}
+        <Loader visible={loading} />
         {items.length !== 0 && <Button onClick={this.loadMore} />}
         {modalShow && <Modal image={largeImage} onClose={this.toggleModal} />}
 

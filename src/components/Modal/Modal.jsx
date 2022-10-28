@@ -17,9 +17,15 @@ export class Modal extends Component {
     }
   };
 
+  handleOverlayClick = e => {
+    if (e.currentTarget === e.target) {
+      this.props.onClose();
+    }
+  };
+
   render() {
     return createPortal(
-      <Overlay>
+      <Overlay onClick={this.handleOverlayClick}>
         <ModalField>
           <img src={this.props.image} alt="big" />
         </ModalField>

@@ -1,4 +1,6 @@
 import { Dna } from 'react-loader-spinner';
+import PropTypes from 'prop-types';
+
 export const Loader = ({ visible }) => (
   <Dna
     visible={visible}
@@ -12,3 +14,7 @@ export const Loader = ({ visible }) => (
     wrapperClass="dna-wrapper"
   />
 );
+
+Loader.propTypes = {
+  visible: PropTypes.bool.isRequired,
+};

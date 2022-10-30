@@ -20,6 +20,7 @@ export class App extends Component {
     loading: false,
     modalShow: false,
     largeImage: '',
+    totalHits: 0,
   };
 
   async componentDidUpdate(_, prevState) {
@@ -29,12 +30,14 @@ export class App extends Component {
       this.setState({ loading: true });
       try {
         const response = await pixabayAPI(searchQuery, page);
-        if (response.length === 0) {
+        this.setState({ totalHits: response.totalHits });
+
+        if (response.hits.length === 0) {
           return toast.error('There are no such images!');
         }
 
         this.setState(prevState => ({
-          items: [...prevState.items, ...response],
+          items: [...prevState.items, ...response.hits],
         }));
       } catch (error) {
         return toast.error('Ooooops...try again later!');
@@ -49,6 +52,7 @@ export class App extends Component {
       searchQuery: value,
       page: 1,
       items: [],
+      disableBtn: false,
     });
   };
 
@@ -70,7 +74,7 @@ export class App extends Component {
   };
 
   render() {
-    const { items, loading, modalShow, largeImage } = this.state;
+    const { items, loading, modalShow, largeImage, totalHits } = this.state;
 
     return (
       <Container>
@@ -78,7 +82,9 @@ export class App extends Component {
         <ImageGallery items={items} onClick={this.showModal} />
 
         <Loader visible={loading} />
-        {items.length !== 0 && <Button onClick={this.loadMore} />}
+        {items.length !== 0 && items.length < totalHits && (
+          <Button onClick={this.loadMore} />
+        )}
         {modalShow && <Modal image={largeImage} onClose={this.toggleModal} />}
 
         <ToastContainer position="top-center" autoClose={3000} theme="dark" />

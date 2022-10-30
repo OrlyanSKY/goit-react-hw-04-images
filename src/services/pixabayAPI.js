@@ -14,5 +14,5 @@ export async function pixabayAPI(q, page) {
   };
 
   const response = await axios.get(BASE_URL, { params });
-  return await response.data.hits;
+  return await response.data;
 }

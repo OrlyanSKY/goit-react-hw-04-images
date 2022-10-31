@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
@@ -12,83 +12,68 @@ import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
 
-export class App extends Component {
-  state = {
-    searchQuery: '',
-    page: 1,
-    items: [],
-    loading: false,
-    modalShow: false,
-    largeImage: '',
-    totalHits: 0,
-  };
+export const App = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const [largeImage, setLargeImage] = useState('');
+  const [totalHits, setTotalHits] = useState(0);
 
-  async componentDidUpdate(_, prevState) {
-    const { page, searchQuery } = this.state;
-
-    if (prevState.page !== page || prevState.searchQuery !== searchQuery) {
-      this.setState({ loading: true });
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
+    }
+    getItems();
+    async function getItems() {
+      setLoading(true);
       try {
         const response = await pixabayAPI(searchQuery, page);
-        this.setState({ totalHits: response.totalHits });
-
+        setTotalHits(response.totalHits);
         if (response.hits.length === 0) {
           return toast.error('There are no such images!');
         }
-
-        this.setState(prevState => ({
-          items: [...prevState.items, ...response.hits],
-        }));
+        setItems(prevState => [...prevState, ...response.hits]);
       } catch (error) {
         return toast.error('Ooooops...try again later!');
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
     }
-  }
+  }, [page, searchQuery]);
 
-  getSearchQueryValue = value => {
-    this.setState({
-      searchQuery: value,
-      page: 1,
-      items: [],
-      disableBtn: false,
-    });
+  const getSearchQueryValue = value => {
+    setSearchQuery(value);
+    setPage(1);
+    setItems([]);
   };
 
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const loadMore = () => {
+    setPage(prevState => prevState + 1);
   };
 
-  showModal = image => {
-    this.setState({ largeImage: image });
-    this.toggleModal();
+  const showModal = image => {
+    setLargeImage(image);
+    toggleModal();
   };
 
-  toggleModal = () => {
-    this.setState(({ modalShow }) => ({
-      modalShow: !modalShow,
-    }));
+  const toggleModal = () => {
+    setModalShow(prevState => !prevState);
   };
 
-  render() {
-    const { items, loading, modalShow, largeImage, totalHits } = this.state;
+  return (
+    <Container>
+      <Searchbar onSubmit={getSearchQueryValue} />
+      <ImageGallery items={items} onClick={showModal} />
 
-    return (
-      <Container>
-        <Searchbar onSubmit={this.getSearchQueryValue} />
-        <ImageGallery items={items} onClick={this.showModal} />
+      <Loader visible={loading} />
+      {items.length !== 0 && items.length < totalHits && (
+        <Button onClick={loadMore} />
+      )}
+      {modalShow && <Modal image={largeImage} onClose={toggleModal} />}
 
-        <Loader visible={loading} />
-        {items.length !== 0 && items.length < totalHits && (
-          <Button onClick={this.loadMore} />
-        )}
-        {modalShow && <Modal image={largeImage} onClose={this.toggleModal} />}
-
-        <ToastContainer position="top-center" autoClose={3000} theme="dark" />
-      </Container>
-    );
-  }
-}
+      <ToastContainer position="top-center" autoClose={3000} theme="dark" />
+    </Container>
+  );
+};
